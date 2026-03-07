@@ -76,7 +76,7 @@ export async function resolveCoords(line: string): Promise<[number, number] | nu
 }
 
 // Haversine distance in km
-function haversine(a: [number, number], b: [number, number]): number {
+export function haversine(a: [number, number], b: [number, number]): number {
   const R = 6371;
   const dLat = ((b[0] - a[0]) * Math.PI) / 180;
   const dLon = ((b[1] - a[1]) * Math.PI) / 180;
@@ -86,6 +86,14 @@ function haversine(a: [number, number], b: [number, number]): number {
       Math.cos((b[0] * Math.PI) / 180) *
       Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+}
+
+export function totalDistance(points: RoutePoint[]): number {
+  let dist = 0;
+  for (let i = 1; i < points.length; i++) {
+    dist += haversine(points[i - 1].coords, points[i].coords);
+  }
+  return dist;
 }
 
 export function optimizeRoute(points: RoutePoint[]): RoutePoint[] {
