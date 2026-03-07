@@ -1,4 +1,4 @@
-import { RoutePoint } from '@/lib/route-utils';
+import { RoutePoint, totalDistance } from '@/lib/route-utils';
 import { Trash2, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
