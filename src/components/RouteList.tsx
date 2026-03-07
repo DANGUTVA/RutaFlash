@@ -60,9 +60,15 @@ export default function RouteList({ points, isOptimized, onRemove }: RouteListPr
         </AnimatePresence>
       </div>
 
-      <div className="pt-3 border-t border-border flex justify-between text-sm">
-        <span className="font-medium text-muted-foreground">Total de paquetes:</span>
-        <span className="font-bold text-primary">{points.length}</span>
+      <div className="pt-3 border-t border-border space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span className="font-medium text-muted-foreground">Total de paquetes:</span>
+          <span className="font-bold text-primary">{points.length}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="font-medium text-muted-foreground">Distancia total:</span>
+          <span className="font-bold text-primary">{totalDistance(points).toFixed(1)} km</span>
+        </div>
       </div>
     </div>
   );
