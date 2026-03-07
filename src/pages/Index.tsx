@@ -1,12 +1,57 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Header from '@/components/Header';
+import AddressInput from '@/components/AddressInput';
+import RouteList from '@/components/RouteList';
+import NavigationPanel from '@/components/NavigationPanel';
+import RouteMap from '@/components/RouteMap';
+import { useRouteState } from '@/hooks/use-route-state';
 
 const Index = () => {
+  const state = useRouteState();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Header />
+
+      <main className="container mx-auto max-w-7xl px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 space-y-6">
+            <AddressInput
+              inputText={state.inputText}
+              setInputText={state.setInputText}
+              ocrProgress={state.ocrProgress}
+              isProcessing={state.isProcessing}
+              onScan={() => state.fileInputRef.current?.click()}
+              onLocation={state.getLocation}
+              onProcess={state.processAddresses}
+              onClear={state.clearAll}
+              fileInputRef={state.fileInputRef as React.RefObject<HTMLInputElement>}
+              onFileChange={state.scanImage}
+            />
+
+            <RouteList
+              points={state.routePoints}
+              isOptimized={state.isOptimized}
+              onRemove={state.removePoint}
+            />
+
+            <NavigationPanel
+              hasPoints={state.routePoints.length > 0}
+              hasMultiple={state.routePoints.length > 1}
+              onOptimize={state.optimize}
+              onWaze={state.openWaze}
+              onGoogleMaps={state.openGoogleMaps}
+            />
+          </div>
+
+          <div className="lg:col-span-2">
+            <RouteMap
+              points={state.routePoints}
+              isOptimized={state.isOptimized}
+              isProcessing={state.isProcessing}
+            />
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
