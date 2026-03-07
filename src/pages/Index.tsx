@@ -3,6 +3,7 @@ import AddressInput from '@/components/AddressInput';
 import RouteList from '@/components/RouteList';
 import NavigationPanel from '@/components/NavigationPanel';
 import RouteMap from '@/components/RouteMap';
+import RouteStats from '@/components/RouteStats';
 import { useRouteState } from '@/hooks/use-route-state';
 
 const Index = () => {
@@ -43,11 +44,15 @@ const Index = () => {
             />
           </div>
 
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <RouteMap
               points={state.routePoints}
               isOptimized={state.isOptimized}
               isProcessing={state.isProcessing}
+            />
+            <RouteStats
+              points={state.routePoints}
+              isOptimized={state.isOptimized}
             />
           </div>
         </div>
