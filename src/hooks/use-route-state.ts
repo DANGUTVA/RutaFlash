@@ -13,12 +13,13 @@ export function useRouteState() {
   const processAddresses = useCallback(async () => {
     const lines = inputText.split('\n').filter((l) => l.trim());
     if (lines.length === 0) {
-      toast.warning('Sin datos', { description: 'Pega links o escanea una etiqueta primero.' });
+      toast.warning('Sin datos', { description: 'Pega links de Waze para comenzar.' });
       return;
     }
 
     setIsProcessing(true);
     const points: RoutePoint[] = [];
+    let invalidLinks = 0;
 
     for (const line of lines) {
       try {
@@ -28,17 +29,20 @@ export function useRouteState() {
             coords,
             originalLink: line.trim(),
             index: points.length + 1,
-            label: line.trim().substring(0, 50),
+            label: `Parada ${points.length + 1}`,
           });
+        } else {
+          invalidLinks++;
         }
       } catch (e) {
         console.error('Error procesando:', line, e);
+        invalidLinks++;
       }
     }
 
     if (points.length === 0) {
       toast.error('Sin coordenadas', {
-        description: 'No pudimos ubicar las direcciones. Asegúrate de que el texto sea claro.',
+        description: 'Asegúrate de pegar links válidos de Waze (waze.com/ul?ll=...).',
       });
       setIsProcessing(false);
       return;
@@ -47,7 +51,14 @@ export function useRouteState() {
     setRoutePoints(points);
     setIsOptimized(false);
     setIsProcessing(false);
-    toast.success(`¡${points.length} paradas mapeadas!`);
+    
+    if (invalidLinks > 0) {
+      toast.success(`${points.length} paradas mapeadas`, {
+        description: `${invalidLinks} link(s) no se pudieron procesar.`,
+      });
+    } else {
+      toast.success(`¡${points.length} paradas mapeadas!`);
+    }
   }, [inputText]);
 
   const optimize = useCallback(() => {
