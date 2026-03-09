@@ -5,6 +5,31 @@ export interface RoutePoint {
   label?: string;
 }
 
+/** Resuelve links acortados de Waze siguiendo redirects */
+async function resolveWazeShortUrl(url: URL): Promise<URL | null> {
+  // Detectar si es un link acortado de Waze (formato /ul/xxxxx sin coordenadas)
+  const isShortLink = url.hostname.includes('waze.com') && 
+                      url.pathname.match(/\/ul\/[a-z0-9]+$/i) &&
+                      !url.searchParams.get('ll');
+
+  if (!isShortLink) return null;
+
+  try {
+    console.log('🔗 Resolviendo link acortado de Waze...');
+    const res = await fetch(url.href, { method: 'HEAD', redirect: 'follow' });
+    const finalUrl = new URL(res.url);
+    
+    if (finalUrl.href !== url.href) {
+      console.log('✅ URL resuelta:', finalUrl.href);
+      return finalUrl;
+    }
+  } catch (e) {
+    console.log('❌ Error resolviendo redirect:', e);
+  }
+  
+  return null;
+}
+
 /** Extrae coordenadas directamente de links de Waze */
 export function parseWazeLink(text: string): [number, number] | null {
   try {
@@ -66,7 +91,7 @@ export function parseWazeLink(text: string): [number, number] | null {
       }
     }
 
-    console.log('❌ No se encontraron coordenadas en el link de Waze');
+    console.log('⚠️ No se encontraron coordenadas directamente');
   } catch (e) {
     console.log('❌ Error parseando URL:', e);
     return null;
@@ -87,8 +112,25 @@ export async function resolveCoords(line: string): Promise<[number, number] | nu
     .replace(/📍\s*PUNTO PARTIDA:/gi, '')
     .trim();
 
-  // Intentar extraer coordenadas del link de Waze
-  const coords = parseWazeLink(cleaned);
+  // Intentar extraer coordenadas del link de Waze directamente
+  let coords = parseWazeLink(cleaned);
+  
+  // Si no se encontraron coordenadas, intentar resolver link acortado
+  if (!coords) {
+    try {
+      const urlMatch = cleaned.match(/https?:\/\/[^\s]+/);
+      if (urlMatch) {
+        const url = new URL(urlMatch[0]);
+        const resolvedUrl = await resolveWazeShortUrl(url);
+        
+        if (resolvedUrl) {
+          coords = parseWazeLink(resolvedUrl.href);
+        }
+      }
+    } catch (e) {
+      console.log('❌ Error resolviendo link acortado:', e);
+    }
+  }
   
   if (coords) {
     console.log('✅ Coordenadas finales:', coords);
