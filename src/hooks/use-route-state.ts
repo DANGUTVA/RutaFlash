@@ -13,12 +13,13 @@ export function useRouteState() {
   const processAddresses = useCallback(async () => {
     const lines = inputText.split('\n').filter((l) => l.trim());
     if (lines.length === 0) {
-      toast.warning('Sin datos', { description: 'Pega links o escanea una etiqueta primero.' });
+      toast.warning('Sin datos', { description: 'Pega links de Waze para comenzar.' });
       return;
     }
 
     setIsProcessing(true);
     const points: RoutePoint[] = [];
+    let invalidLinks = 0;
 
     for (const line of lines) {
       try {
@@ -28,17 +29,20 @@ export function useRouteState() {
             coords,
             originalLink: line.trim(),
             index: points.length + 1,
-            label: line.trim().substring(0, 50),
+            label: `Parada ${points.length + 1}`,
           });
+        } else {
+          invalidLinks++;
         }
       } catch (e) {
         console.error('Error procesando:', line, e);
+        invalidLinks++;
       }
     }
 
     if (points.length === 0) {
       toast.error('Sin coordenadas', {
-        description: 'No pudimos ubicar las direcciones. Asegúrate de que el texto sea claro.',
+        description: 'Asegúrate de pegar links válidos de Waze (waze.com/ul?ll=...).',
       });
       setIsProcessing(false);
       return;
@@ -47,7 +51,14 @@ export function useRouteState() {
     setRoutePoints(points);
     setIsOptimized(false);
     setIsProcessing(false);
-    toast.success(`¡${points.length} paradas mapeadas!`);
+    
+    if (invalidLinks > 0) {
+      toast.success(`${points.length} paradas mapeadas`, {
+        description: `${invalidLinks} link(s) no se pudieron procesar.`,
+      });
+    } else {
+      toast.success(`¡${points.length} paradas mapeadas!`);
+    }
   }, [inputText]);
 
   const optimize = useCallback(() => {
@@ -124,9 +135,28 @@ export function useRouteState() {
 
   const openGoogleMaps = useCallback(() => {
     if (routePoints.length === 0) return;
-    let url = 'https://www.google.com/maps/dir/';
-    routePoints.forEach((p) => (url += `${p.coords[0]},${p.coords[1]}/`));
-    window.open(url, '_blank');
+    
+    // Construir URL de Google Maps con waypoints para abrir en la app nativa
+    const origin = `${routePoints[0].coords[0]},${routePoints[0].coords[1]}`;
+    const destination = routePoints.length > 1 
+      ? `${routePoints[routePoints.length - 1].coords[0]},${routePoints[routePoints.length - 1].coords[1]}`
+      : origin;
+    
+    let url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`;
+    
+    // Agregar waypoints intermedios si hay más de 2 puntos
+    if (routePoints.length > 2) {
+      const waypoints = routePoints
+        .slice(1, -1)
+        .map((p) => `${p.coords[0]},${p.coords[1]}`)
+        .join('|');
+      url += `&waypoints=${waypoints}`;
+    }
+    
+    url += '&travelmode=driving';
+    
+    // En móvil esto abrirá la app de Google Maps si está instalada
+    window.location.href = url;
   }, [routePoints]);
 
   return {

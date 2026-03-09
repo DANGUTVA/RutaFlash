@@ -35,15 +35,15 @@ export default function RouteMap({ points, isOptimized, isProcessing }: RouteMap
   const hasPoints = points.length > 0;
 
   return (
-    <div className="glass-card rounded-2xl p-5 h-full flex flex-col">
-      <h2 className="text-lg font-semibold font-display flex items-center gap-2 mb-4">
-        <span className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Camera className="h-4 w-4 text-primary" />
+    <div className="glass-card rounded-2xl p-4 md:p-5 h-full flex flex-col">
+      <h2 className="text-base md:text-lg font-semibold font-display flex items-center gap-2 mb-3 md:mb-4">
+        <span className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Camera className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary" />
         </span>
-        Mapa Inteligente
+        Mapa de Ruta
       </h2>
 
-      <div className="flex-1 min-h-[400px] rounded-xl overflow-hidden relative">
+      <div className="flex-1 min-h-[300px] md:min-h-[400px] rounded-xl overflow-hidden relative">
         <AnimatePresence mode="wait">
           {isProcessing ? (
             <motion.div
@@ -64,13 +64,12 @@ export default function RouteMap({ points, isOptimized, isProcessing }: RouteMap
               exit={{ opacity: 0 }}
               className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/30 border-2 border-dashed border-border rounded-xl p-8 text-center z-10"
             >
-              <Camera className="h-16 w-16 text-primary/30 mb-4" />
-              <h3 className="text-xl font-bold font-display text-foreground mb-2">
-                Paso 1: Toma la foto
+              <Camera className="h-12 w-12 md:h-16 md:w-16 text-primary/30 mb-3 md:mb-4" />
+              <h3 className="text-lg md:text-xl font-bold font-display text-foreground mb-2">
+                Pega tus links de Waze
               </h3>
-              <p className="text-sm text-muted-foreground max-w-sm">
-                Toma una foto clara a la etiqueta del paquete asegurándote de que haya buena luz.
-                La IA extraerá la dirección por ti.
+              <p className="text-xs md:text-sm text-muted-foreground max-w-sm px-4">
+                Copia y pega los links de Waze (uno por línea) en el cuadro de texto de arriba.
               </p>
             </motion.div>
           ) : null}

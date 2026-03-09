@@ -29,25 +29,18 @@ export default function AddressInput({
   onFileChange,
 }: AddressInputProps) {
   return (
-    <div className="glass-card rounded-2xl p-5 space-y-4">
-      <h2 className="text-lg font-semibold font-display flex items-center gap-2">
-        <span className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Sparkles className="h-4 w-4 text-primary" />
+    <div className="glass-card rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4">
+      <h2 className="text-base md:text-lg font-semibold font-display flex items-center gap-2">
+        <span className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Sparkles className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary" />
         </span>
-        Ingreso de Direcciones
+        Links de Waze
       </h2>
 
       <div className="flex gap-2">
         <Button
           variant="secondary"
-          className="flex-1 gap-2"
-          onClick={onScan}
-        >
-          <Camera className="h-4 w-4" /> Escanear
-        </Button>
-        <Button
-          variant="secondary"
-          className="flex-1 gap-2"
+          className="flex-1 gap-2 h-10 text-sm"
           onClick={onLocation}
         >
           <MapPin className="h-4 w-4" /> Mi Ubicación
@@ -70,8 +63,8 @@ export default function AddressInput({
         <Textarea
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Pega links de Waze, Google Maps, o escanea la etiqueta del paquete..."
-          className="min-h-[140px] resize-none bg-background/50"
+          placeholder="Pega aquí los links de Waze (uno por línea)&#10;Ejemplo: https://waze.com/ul?ll=9.9281,-84.0907"
+          className="min-h-[140px] resize-none bg-background/50 text-sm"
         />
         <AnimatePresence>
           {ocrProgress && (
@@ -91,7 +84,7 @@ export default function AddressInput({
 
       <div className="flex gap-2">
         <Button
-          className="flex-1 gap-2 gradient-header text-primary-foreground border-0 hover:opacity-90"
+          className="flex-1 gap-2 gradient-header text-primary-foreground border-0 hover:opacity-90 h-11 text-sm md:text-base"
           onClick={onProcess}
           disabled={isProcessing || !inputText.trim()}
         >
@@ -100,9 +93,9 @@ export default function AddressInput({
           ) : (
             <Sparkles className="h-4 w-4" />
           )}
-          Procesar
+          Procesar Links
         </Button>
-        <Button variant="outline" size="icon" onClick={onClear} title="Limpiar todo">
+        <Button variant="outline" size="icon" onClick={onClear} title="Limpiar todo" className="h-11">
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>
