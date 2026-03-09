@@ -29,25 +29,18 @@ export default function AddressInput({
   onFileChange,
 }: AddressInputProps) {
   return (
-    <div className="glass-card rounded-2xl p-5 space-y-4">
-      <h2 className="text-lg font-semibold font-display flex items-center gap-2">
-        <span className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Sparkles className="h-4 w-4 text-primary" />
+    <div className="glass-card rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4">
+      <h2 className="text-base md:text-lg font-semibold font-display flex items-center gap-2">
+        <span className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Sparkles className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary" />
         </span>
-        Ingreso de Direcciones
+        Links de Waze
       </h2>
 
       <div className="flex gap-2">
         <Button
           variant="secondary"
-          className="flex-1 gap-2"
-          onClick={onScan}
-        >
-          <Camera className="h-4 w-4" /> Escanear
-        </Button>
-        <Button
-          variant="secondary"
-          className="flex-1 gap-2"
+          className="flex-1 gap-2 h-10 text-sm"
           onClick={onLocation}
         >
           <MapPin className="h-4 w-4" /> Mi Ubicación
