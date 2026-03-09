@@ -8,16 +8,28 @@ export interface RoutePoint {
 /** Extrae coordenadas directamente de links de Waze */
 export function parseWazeLink(text: string): [number, number] | null {
   try {
-    const url = new URL(text.trim());
+    // Primero intentar extraer una URL del texto
+    const urlMatch = text.match(/https?:\/\/[^\s]+/);
+    const urlString = urlMatch ? urlMatch[0] : text.trim();
+    
+    const url = new URL(urlString);
     
     // Solo procesar links de Waze
-    if (!url.hostname.includes('waze.com')) return null;
+    if (!url.hostname.includes('waze.com')) {
+      console.log('❌ No es un link de Waze:', url.hostname);
+      return null;
+    }
+
+    console.log('🔍 Procesando Waze URL:', url.href);
 
     // Patrón 1: ?ll=lat,lon
     const ll = url.searchParams.get('ll');
     if (ll) {
       const [lat, lon] = ll.split(',').map(Number);
-      if (!isNaN(lat) && !isNaN(lon)) return [lat, lon];
+      if (!isNaN(lat) && !isNaN(lon)) {
+        console.log('✅ Coordenadas extraídas (?ll):', lat, lon);
+        return [lat, lon];
+      }
     }
 
     // Patrón 2: ?q=lat,lon
@@ -27,16 +39,36 @@ export function parseWazeLink(text: string): [number, number] | null {
       if (match) {
         const lat = parseFloat(match[1]);
         const lon = parseFloat(match[2]);
-        if (!isNaN(lat) && !isNaN(lon)) return [lat, lon];
+        if (!isNaN(lat) && !isNaN(lon)) {
+          console.log('✅ Coordenadas extraídas (?q):', lat, lon);
+          return [lat, lon];
+        }
       }
     }
 
     // Patrón 3: /ul/lat,lon en el path
     const pathMatch = url.href.match(/waze\.com\/ul\/(-?\d+\.?\d*),(-?\d+\.?\d*)/);
     if (pathMatch) {
-      return [parseFloat(pathMatch[1]), parseFloat(pathMatch[2])];
+      const coords: [number, number] = [parseFloat(pathMatch[1]), parseFloat(pathMatch[2])];
+      console.log('✅ Coordenadas extraídas (path):', coords);
+      return coords;
     }
-  } catch {
+
+    // Patrón 4: /ul?navigate=yes con otros parámetros
+    const navigate = url.searchParams.get('navigate');
+    if (navigate) {
+      // Buscar en toda la URL
+      const coordMatch = url.href.match(/(-?\d+\.?\d+),(-?\d+\.?\d+)/);
+      if (coordMatch) {
+        const coords: [number, number] = [parseFloat(coordMatch[1]), parseFloat(coordMatch[2])];
+        console.log('✅ Coordenadas extraídas (navigate):', coords);
+        return coords;
+      }
+    }
+
+    console.log('❌ No se encontraron coordenadas en el link de Waze');
+  } catch (e) {
+    console.log('❌ Error parseando URL:', e);
     return null;
   }
 
@@ -47,6 +79,8 @@ export function parseWazeLink(text: string): [number, number] | null {
 export async function resolveCoords(line: string): Promise<[number, number] | null> {
   const trimmed = line.trim();
   
+  console.log('🔄 Procesando línea:', trimmed.substring(0, 100));
+  
   // Limpiar prefijos comunes
   const cleaned = trimmed
     .replace(/📦\s*\[Revisar\]\s*Dirección:/gi, '')
@@ -54,7 +88,15 @@ export async function resolveCoords(line: string): Promise<[number, number] | nu
     .trim();
 
   // Intentar extraer coordenadas del link de Waze
-  return parseWazeLink(cleaned);
+  const coords = parseWazeLink(cleaned);
+  
+  if (coords) {
+    console.log('✅ Coordenadas finales:', coords);
+  } else {
+    console.log('❌ No se pudieron extraer coordenadas');
+  }
+  
+  return coords;
 }
 
 // Haversine distance in km
