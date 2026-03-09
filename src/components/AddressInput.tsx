@@ -84,7 +84,7 @@ export default function AddressInput({
 
       <div className="flex gap-2">
         <Button
-          className="flex-1 gap-2 gradient-header text-primary-foreground border-0 hover:opacity-90"
+          className="flex-1 gap-2 gradient-header text-primary-foreground border-0 hover:opacity-90 h-11 text-sm md:text-base"
           onClick={onProcess}
           disabled={isProcessing || !inputText.trim()}
         >
@@ -93,9 +93,9 @@ export default function AddressInput({
           ) : (
             <Sparkles className="h-4 w-4" />
           )}
-          Procesar
+          Procesar Links
         </Button>
-        <Button variant="outline" size="icon" onClick={onClear} title="Limpiar todo">
+        <Button variant="outline" size="icon" onClick={onClear} title="Limpiar todo" className="h-11">
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>

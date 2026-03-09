@@ -135,9 +135,28 @@ export function useRouteState() {
 
   const openGoogleMaps = useCallback(() => {
     if (routePoints.length === 0) return;
-    let url = 'https://www.google.com/maps/dir/';
-    routePoints.forEach((p) => (url += `${p.coords[0]},${p.coords[1]}/`));
-    window.open(url, '_blank');
+    
+    // Construir URL de Google Maps con waypoints para abrir en la app nativa
+    const origin = `${routePoints[0].coords[0]},${routePoints[0].coords[1]}`;
+    const destination = routePoints.length > 1 
+      ? `${routePoints[routePoints.length - 1].coords[0]},${routePoints[routePoints.length - 1].coords[1]}`
+      : origin;
+    
+    let url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`;
+    
+    // Agregar waypoints intermedios si hay más de 2 puntos
+    if (routePoints.length > 2) {
+      const waypoints = routePoints
+        .slice(1, -1)
+        .map((p) => `${p.coords[0]},${p.coords[1]}`)
+        .join('|');
+      url += `&waypoints=${waypoints}`;
+    }
+    
+    url += '&travelmode=driving';
+    
+    // En móvil esto abrirá la app de Google Maps si está instalada
+    window.location.href = url;
   }, [routePoints]);
 
   return {

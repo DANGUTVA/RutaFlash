@@ -43,71 +43,18 @@ export function parseWazeLink(text: string): [number, number] | null {
   return null;
 }
 
-/** Follow short URL redirects (goo.gl, maps.app.goo.gl, waze.com/ul/...) to get final URL */
-async function resolveShortUrl(url: URL): Promise<URL | null> {
-  const isShort =
-    url.hostname.includes('goo.gl') ||
-    url.hostname.includes('maps.app') ||
-    (url.hostname.includes('waze.com') && url.pathname.startsWith('/ul/') && !url.searchParams.get('ll'));
-
-  if (!isShort) return null;
-
-  try {
-    const res = await fetch(url.href, { method: 'HEAD', redirect: 'follow' });
-    const finalUrl = new URL(res.url);
-    if (finalUrl.href !== url.href) return finalUrl;
-  } catch { /* ignore */ }
-  return null;
-}
-
-export async function geocodeText(query: string): Promise<[number, number] | null> {
-  const clean = query
+/** Procesa una línea de texto que debe contener un link de Waze */
+export async function resolveCoords(line: string): Promise<[number, number] | null> {
+  const trimmed = line.trim();
+  
+  // Limpiar prefijos comunes
+  const cleaned = trimmed
     .replace(/📦\s*\[Revisar\]\s*Dirección:/gi, '')
     .replace(/📍\s*PUNTO PARTIDA:/gi, '')
-    .replace(/[^a-zA-Z0-9\s,áéíóúÁÉÍÓÚñÑ#\-.]/g, ' ')
-    .replace(/\s+/g, ' ')
     .trim();
 
-  if (clean.length < 5) return null;
-
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(clean)}&limit=1&countrycodes=CR`,
-      { headers: { 'User-Agent': 'RutaFlash-App/2.0' } }
-    );
-    const data = await res.json();
-    if (data?.length > 0) {
-      return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-    }
-  } catch { /* ignore */ }
-  return null;
-}
-
-export async function resolveCoords(line: string): Promise<[number, number] | null> {
-  // 1. Try raw coordinate text first
-  const rawCoords = parseCoordsFromRawText(line);
-  if (rawCoords) return rawCoords;
-
-  // 2. Extract URLs and try to parse coords directly
-  const { urls, rawText } = extractCoordsFromText(line);
-  for (const url of urls) {
-    const coords = parseCoordsFromUrl(url);
-    if (coords) return coords;
-  }
-
-  // 3. Try resolving short URLs (goo.gl, maps.app.goo.gl, waze short links)
-  for (const url of urls) {
-    try {
-      const resolved = await resolveShortUrl(url);
-      if (resolved) {
-        const coords = parseCoordsFromUrl(resolved);
-        if (coords) return coords;
-      }
-    } catch { /* ignore */ }
-  }
-
-  // 4. Fallback to geocoding
-  return geocodeText(rawText);
+  // Intentar extraer coordenadas del link de Waze
+  return parseWazeLink(cleaned);
 }
 
 // Haversine distance in km
