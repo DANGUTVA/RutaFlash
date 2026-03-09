@@ -13,9 +13,9 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="container mx-auto max-w-7xl px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 space-y-6">
+      <main className="container mx-auto max-w-7xl px-4 py-4 md:py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          <div className="lg:col-span-1 space-y-4 md:space-y-6">
             <AddressInput
               inputText={state.inputText}
               setInputText={state.setInputText}
