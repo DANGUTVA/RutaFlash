@@ -35,15 +35,15 @@ export default function RouteMap({ points, isOptimized, isProcessing }: RouteMap
   const hasPoints = points.length > 0;
 
   return (
-    <div className="glass-card rounded-2xl p-5 h-full flex flex-col">
-      <h2 className="text-lg font-semibold font-display flex items-center gap-2 mb-4">
-        <span className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Camera className="h-4 w-4 text-primary" />
+    <div className="glass-card rounded-2xl p-4 md:p-5 h-full flex flex-col">
+      <h2 className="text-base md:text-lg font-semibold font-display flex items-center gap-2 mb-3 md:mb-4">
+        <span className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Camera className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary" />
         </span>
-        Mapa Inteligente
+        Mapa de Ruta
       </h2>
 
-      <div className="flex-1 min-h-[400px] rounded-xl overflow-hidden relative">
+      <div className="flex-1 min-h-[300px] md:min-h-[400px] rounded-xl overflow-hidden relative">
         <AnimatePresence mode="wait">
           {isProcessing ? (
             <motion.div
