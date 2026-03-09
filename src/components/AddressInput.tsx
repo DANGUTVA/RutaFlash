@@ -70,8 +70,8 @@ export default function AddressInput({
         <Textarea
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Pega links de Waze, Google Maps, o escanea la etiqueta del paquete..."
-          className="min-h-[140px] resize-none bg-background/50"
+          placeholder="Pega aquí los links de Waze (uno por línea)&#10;Ejemplo: https://waze.com/ul?ll=9.9281,-84.0907"
+          className="min-h-[140px] resize-none bg-background/50 text-sm"
         />
         <AnimatePresence>
           {ocrProgress && (
